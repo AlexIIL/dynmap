@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -1608,16 +1611,24 @@ public class TexturePack {
         }
         // Check mods to see if texture files defined there
         for (String modid : core.getServer().getModList()) {
-            File f = core.getServer().getModContainerFile(modid);   // Get mod file
-            if ((f != null) && f.isFile()) {
+            Path f = core.getServer().getModContainerPath(modid);   // Get mod file
+            if (f != null && Files.exists(f)) {
                 ZipFile zf = null;
-                in = null;
                 try {
-                    zf = new ZipFile(f);
                     String fn = "assets/" + modid.toLowerCase() + "/dynmap-texture.txt";
-                    ZipEntry ze = zf.getEntry(fn);
-                    if (ze != null) {
-                        in = zf.getInputStream(ze);
+                    if (Files.isDirectory(f)) {
+                        Path sub = f.resolve(fn.replace("/", f.getFileSystem().getSeparator()));
+                        if (Files.isRegularFile(sub)) {
+                            in = Files.newInputStream(sub);
+                        }
+                    } else if (Files.isRegularFile(f) && f.getFileSystem() == FileSystems.getDefault()) {
+                        zf = new ZipFile(f.toFile());
+                        ZipEntry ze = zf.getEntry(fn);
+                        if (ze != null) {
+                            in = zf.getInputStream(ze);
+                        }
+                    }
+                    if (in != null) {
                         loadTextureFile(in, fn, config, core, modid);
                         loadedmods.add(modid);  // Add to set: prevent others definitions for same mod
                     }

@@ -537,14 +537,10 @@ public class FabricServer extends DynmapServerInterface {
     }
 
     @Override
-    public File getModContainerFile(String name) {
+    public Path getModContainerPath(String name) {
         Optional<ModContainer> container = getModContainerById(name);    // Try case sensitive lookup
         if (container.isPresent()) {
-            Path path = container.get().getRootPath();
-            if (path.getFileSystem().provider().getScheme().equals("jar")) {
-                path = Paths.get(path.getFileSystem().toString());
-            }
-            return path.toFile();
+            return container.get().getRootPath();
         }
         return null;
     }

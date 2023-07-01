@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +27,7 @@ public class TexturePackLoader {
     
     private static class ModSource {
         ZipFile zf;
-        File directory;
+        Path directory;
     }
     private HashMap<String, ModSource> src_by_mod = new HashMap<String, ModSource>();
     
@@ -81,16 +84,16 @@ public class TexturePackLoader {
         if (modname != null) {
             ModSource ms = src_by_mod.get(modname);
             if (ms == null) {
-                File f = dsi.getModContainerFile(modname);
+                Path f = dsi.getModContainerPath(modname);
                 ms = new ModSource();
                 if (f != null) {
-                    if (f.isFile()) {
+                    if (Files.isRegularFile(f) && f.getFileSystem() == FileSystems.getDefault()) {
                         try {
-                            ms.zf = new ZipFile(f);
+                            ms.zf = new ZipFile(f.toFile());
                         } catch (IOException e) {
                         }
                     }
-                    else {
+                    else if (Files.isDirectory(f)) {
                         ms.directory = f;
                     }
                 }
@@ -104,9 +107,9 @@ public class TexturePackLoader {
                     }
                 }
                 else if (ms.directory != null) {
-                    File f = new File(ms.directory, rname);
-                    if (f.isFile() && f.canRead()) {
-                        is = new FileInputStream(f);
+                    Path f = ms.directory.resolve(rname);
+                    if (Files.isRegularFile(f) && Files.isReadable(f)) {
+                        is = Files.newInputStream(f);
                     }
                 }
             } catch (IOException iox) {

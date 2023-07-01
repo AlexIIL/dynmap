@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
@@ -1024,11 +1025,11 @@ public class DynmapPlugin
                 return server.getServerHostname();
         }
         @Override
-        public File getModContainerFile(String name) {
+        public Path getModContainerPath(String name) {
         	ModFileInfo mfi = ModList.get().getModFileById(name);    // Try case sensitive lookup
             if (mfi != null) {
             	File f = mfi.getFile().getFilePath().toFile();
-                return f;
+                return f.toPath();
             }
         	return null;
         }

@@ -2,6 +2,7 @@ package org.dynmap.common;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -203,7 +204,7 @@ public abstract class DynmapServerInterface {
      * @param mod - mod name
      * @return file or directory, or null if not loaded
      */
-    public File getModContainerFile(String mod) {
+    public Path getModContainerPath(String mod) {
         return null;
     }
     /**

@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -1022,12 +1023,12 @@ public class DynmapPlugin
                 return server.getLocalIp();
         }
         @Override
-        public File getModContainerFile(String name) {
+        public Path getModContainerPath(String name) {
             ModFileInfo mfi = LoadingModList.get().getModFileById(name);    // Try case sensitive lookup
             if (mfi != null) {
                 try {
                     File f = mfi.getFile().getFilePath().toFile();
-                    return f;
+                    return f.toPath();
                 }
                 catch (UnsupportedOperationException ex) {
                     //TODO Implement proper jar in jar method for fetching data
